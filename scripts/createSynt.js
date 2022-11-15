@@ -1,4 +1,3 @@
-const { getContractFactory } = require("@nomiclabs/hardhat-ethers/types");
 const hre = require("hardhat");
 const ethers = hre.ethers;
 const config = require("./contracts.json");
@@ -48,6 +47,15 @@ async function addSynt(name, symbol, synter, oracle, feedAddress) {
     return synt;
 }
 
+async function addTruflationSynt(name, symbol, synter, oracle, feedAddress) {
+    synt = await deploySynt(name, symbol);
+    await synt.initialize(synter.address);
+    await oracle.changeTruflationFeed(synt.address, feedAddress);
+    await synter.addSynt(synt.address, true);
+    console.log("Truflation Synt { %s } set with feed { %s }", synt.address, feedAddress);
+    return synt;
+}
+
 async function main() {
     Synter = await ethers.getContractFactory("Synter");
     synter = await Synter.attach(config.SYNTER);
@@ -55,8 +63,13 @@ async function main() {
     Oracle = await ethers.getContractFactory("Oracle");
     oracle = await Oracle.attach(config.ORACLE);
 
-    await addSynt("GOLD", "rGLD", synter, oracle, "0x7b219F57a8e9C7303204Af681e9fA69d17ef626f");
-    await createSynt("GAS", "rGAS", synter, oracle, ethers.utils.parseEther("6.4")); // 5$ per gallon
+    // await addTruflationSynt("Housing Prices Index", "rHPI", synter, oracle, config.TRUFLATION);
+    // await oracle.changeFeed(config.RGLD, config.DATAFEED_RGLD);
+    // await oracle.changeFeed(config.RGAS, config.DATAFEED_RGAS);
+    // await oracle.changeFeed(config.RAW, config.DATAFEED_RAW);
+
+    // await addSynt("GOLD", "rGLD", synter, oracle, "0x7b219F57a8e9C7303204Af681e9fA69d17ef626f");
+    // await createSynt("GAS", "rGAS", synter, oracle, ethers.utils.parseEther("6.4")); // 5$ per gallon
 }
 
 // We recommend this pattern to be able to use async/await everywhere
