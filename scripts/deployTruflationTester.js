@@ -7,7 +7,7 @@ async function main() {
     tester = await Tester.deploy(
         "0xcf72083697aB8A45905870C387dC93f380f2557b",
         "8b459447262a4ccf8863962e073576d9",
-        1000000000000
+        ethers.utils.parseEther("1.0").div(100)
     );
 
     console.log("TruflationTester deployed at { %s }", tester.address);
