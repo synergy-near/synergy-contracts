@@ -26,7 +26,7 @@ contract Raw is ERC20, Ownable {
     /**
      * @dev function just for testnet
      */
-    function mintTest(uint256 _amount) external onlyOwner {
+    function mintTest(uint256 _amount) external {
         _mint(msg.sender, _amount);
     }
 }
