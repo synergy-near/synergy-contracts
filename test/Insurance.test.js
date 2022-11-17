@@ -201,5 +201,48 @@ describe("Insurance", function () {
             await insurance.unstakeRaw(insId);
             expect(await raw.balanceOf(deployer.address)).to.be.equal(ETH.mul(1000));
         });
+        it("Should delete and add correctly", async function () {
+            await raw.mintTest(ETH.mul(1000));
+            await raw.approve(insurance.address, ETH.mul(1000));
+
+            await insurance.stakeRaw(2628000, ETH.mul(100)); // A
+            await insurance.stakeRaw(2628000, ETH.mul(100)); // B
+            await insurance.stakeRaw(2628000, ETH.mul(100)); // C
+            insIdA = await insurance.userInsurances(deployer.address, 0);
+            insIdB = await insurance.userInsurances(deployer.address, 1);
+            insIdC = await insurance.userInsurances(deployer.address, 2);
+            // correct total
+            expect(await insurance.totalInsurances(deployer.address)).to.be.equal(3);
+            // correct ind
+            expect((await insurance.insurances(insIdB))[5]).to.be.equal(1);
+            // change time
+            await ethers.provider.send("evm_increaseTime", [63070000 + 1]);
+            await ethers.provider.send("evm_mine");
+
+            // unstake
+            await insurance.unstakeRaw(insIdB);
+            expect((await insurance.insurances(insIdA))[5]).to.be.equal(0);
+            expect((await insurance.insurances(insIdB))[5]).to.be.equal(0); // deleted
+            expect((await insurance.insurances(insIdC))[5]).to.be.equal(1);
+            expect(await insurance.totalInsurances(deployer.address)).to.be.equal(2);
+            expect(await insurance.userInsurances(deployer.address, 0)).to.be.equal(insIdA);
+            expect(await insurance.userInsurances(deployer.address, 1)).to.be.equal(insIdC);
+
+            // unstake
+            await insurance.unstakeRaw(insIdA);
+            expect((await insurance.insurances(insIdA))[5]).to.be.equal(0); // deleted
+            expect((await insurance.insurances(insIdB))[5]).to.be.equal(0); // deleted
+            expect((await insurance.insurances(insIdC))[5]).to.be.equal(0);
+            expect(await insurance.totalInsurances(deployer.address)).to.be.equal(1);
+            expect(await insurance.userInsurances(deployer.address, 0)).to.be.equal(insIdC);
+
+            // unstake
+            await insurance.unstakeRaw(insIdC);
+            expect((await insurance.insurances(insIdA))[5]).to.be.equal(0); // deleted
+            expect((await insurance.insurances(insIdB))[5]).to.be.equal(0); // deleted
+            expect((await insurance.insurances(insIdC))[5]).to.be.equal(0); // deleted
+            expect(await insurance.totalInsurances(deployer.address)).to.be.equal(0);
+            await expect(insurance.userInsurances(deployer.address, 0)).to.be.reverted;
+        });
     });
 });

@@ -21,6 +21,7 @@ contract Insurance is Ownable {
     uint256 public minLockTime; // min insurance lock time
     mapping(bytes32 => UserInsurance) public insurances; // every insurance has unique id
     mapping(address => bytes32[]) public userInsurances; // list of user's insurances
+    mapping(address => uint32) public totalInsurances; // total numbler of insurances of each user
 
     constructor(uint256 _minLockTime, uint256 _maxLockTime) {
         minLockTime = _minLockTime;
@@ -52,7 +53,7 @@ contract Insurance is Ownable {
      * @param _amount amount of RAW to lock for insurance
      * @return insId_ Unique id of the insurance
      */
-    function stakeRaw(uint256 _lockTime, uint256 _amount) external returns (bytes32 insId_) {
+    function stakeRaw(uint32 _lockTime, uint256 _amount) external returns (bytes32 insId_) {
         require(_lockTime >= minLockTime, "Lock time is too low");
         require(_amount != 0, "Lock amount is zero");
 
@@ -67,7 +68,8 @@ contract Insurance is Ownable {
             stakedRaw: _amount,
             repaidRaw: 0,
             startTime: block.timestamp,
-            lockTime: _lockTime
+            lockTime: _lockTime,
+            insInd: totalInsurances[msg.sender]++
         });
 
         userInsurances[msg.sender].push(insId_);
@@ -80,10 +82,25 @@ contract Insurance is Ownable {
      * @param _insId unique insurance id
      */
     function unstakeRaw(bytes32 _insId) external {
-        require(insurances[_insId].user == msg.sender, "Wrong user");
+        UserInsurance storage insurance_ = insurances[_insId];
+
+        require(insurance_.user == msg.sender, "Wrong user");
         require(getUnlockTime(_insId) <= block.timestamp, "Insurance is locked up");
 
-        raw.transfer(msg.sender, insurances[_insId].stakedRaw);
+        raw.transfer(msg.sender, insurance_.stakedRaw);
+
+        uint32 insIndex_ = insurance_.insInd;
+
+        uint256 totalIns_ = totalInsurances[msg.sender]--;
+
+        userInsurances[msg.sender][insIndex_] = userInsurances[msg.sender][totalIns_ - 1];
+
+        userInsurances[msg.sender].pop();
+        // change index of the last collateral which was moved
+        if (userInsurances[msg.sender].length != insIndex_) {
+            insurances[userInsurances[msg.sender][insIndex_]].insInd = insIndex_;
+        }
+
         delete insurances[_insId];
 
         emit RemovedInsurance(msg.sender, _insId);

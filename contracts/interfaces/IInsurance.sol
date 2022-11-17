@@ -6,7 +6,8 @@ struct UserInsurance {
     uint256 stakedRaw;
     uint256 repaidRaw;
     uint256 startTime;
-    uint256 lockTime;
+    uint32 lockTime;
+    uint32 insInd;
 }
 
 interface IInsurance {
@@ -14,6 +15,7 @@ interface IInsurance {
     function unstakeRaw(bytes32 insId) external; // cancel all insurance
     function compensate(bytes32 insId, uint256 amount) external returns (uint256);
     function userInsurances(address user) external view returns (uint256);
+    function totalInsurance(address user) external view returns (uint256);
     function insurances(bytes32 insId) external view returns (UserInsurance memory);
     function availableCompensation(bytes32 insId) external view returns (uint256);
 }
