@@ -265,6 +265,7 @@ describe("Loan", function () {
             borrowId = receipt.logs[3].topics[2];
 
             expect(await loan.collateralRatio(borrowId)).to.be.equal(2e8);
+            expect(await loan.totalLoans(deployer.address)).to.be.equal(1);
 
             await dataFeed.changePrice(ETH.mul(10)); // dump 10x
 
@@ -276,6 +277,7 @@ describe("Loan", function () {
 
             expect(await rUsd.balanceOf(deployer.address)).to.be.equal(ETH.mul(2000));
             expect(await rGld.balanceOf(deployer.address)).to.be.equal(ETH.mul(0));
+            expect(await loan.totalLoans(deployer.address)).to.be.equal(0);
         });
         it("Should correctly predict CR after borrow on increase", async function () {
             // set datafeed for rGLD with price 100$

@@ -6,6 +6,7 @@ struct UserLoan {
     address syntAddress; // address of borrowed synt
     uint256 borrowed; // total synt borrowed
     uint256 collateral; // collateral in rUSD
+    uint256 timestamp; // borrowing timestamp
     uint32 minCollateralRatio; // minCollateralRation at the moment of borrowing (8 decimals)
     uint32 liquidationCollateralRatio; // liquidationCollateralRation at the moment of borrowing (8 decimals)
     uint32 liquidationPenalty; // liquidationPenalty at the moment of borrowing (8 decimals)

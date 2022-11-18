@@ -29,6 +29,7 @@ contract Loan is Ownable {
     uint32 public treasuryFee; // treasury liquidation fee e.g. 0.2 (8 decimals)
     mapping(bytes32 => UserLoan) public loans;
     mapping(address => bytes32[]) public userLoans;
+    mapping(address => uint32) public totalLoans; // total loans of user
 
     constructor(
         uint32 _minCollateralRatio,
@@ -74,7 +75,7 @@ contract Loan is Ownable {
      * @param _amountToBorrow amount of synt to borrow
      * @param _amountToPledge amount of rUSD to leave as a collateral
      */
-    function borrow(address _syntAddress, uint256 _amountToBorrow, uint256 _amountToPledge) external {
+    function borrow(address _syntAddress, uint256 _amountToBorrow, uint256 _amountToPledge) public {
         require(synter.syntInfo(_syntAddress).shortsEnabled, "Shorts for the synt should be turned on");
         require(_amountToBorrow != 0, "Borrow ammount cannot be zero");
 
@@ -87,11 +88,12 @@ contract Loan is Ownable {
             syntAddress: _syntAddress,
             borrowed: _amountToBorrow,
             collateral: _amountToPledge,
+            timestamp: block.timestamp,
             minCollateralRatio: minCollateralRatio,
             liquidationCollateralRatio: liquidationCollateralRatio,
             liquidationPenalty: liquidationPenalty,
             treasuryFee: treasuryFee,
-            loanIndex: uint32(userLoans[msg.sender].length - 1)
+            loanIndex: totalLoans[msg.sender]++
         });
 
         uint32 collateralRatio_ = collateralRatio(borrowId_);
@@ -162,7 +164,7 @@ contract Loan is Ownable {
         if (loan.collateral == 0 && loan.borrowed == 0) {
             // close loan
             uint32 loanIndex_ = loan.loanIndex;
-            uint256 totalLoans_ = userLoans[msg.sender].length;
+            uint256 totalLoans_ = totalLoans[msg.sender]--;
             userLoans[msg.sender][loanIndex_] = userLoans[msg.sender][totalLoans_ - 1];
             userLoans[msg.sender].pop();
             // change index of the last collateral which was moved
