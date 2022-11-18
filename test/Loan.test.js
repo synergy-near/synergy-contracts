@@ -387,5 +387,19 @@ describe("Loan", function () {
             await expect(loan.collateralRatio(borrowId)).to.be.revertedWith("Loan doesn't exist");
             expect(crPredict).to.be.equal(0);
         });
+        it("Should show totalShorts and totalLongs", async function () {
+            // set datafeed for rGLD with price 100$
+            dataFeed = await deployMockDataFeed("GOLD", ETH.mul(100));
+            await oracle.changeFeed(rGld.address, dataFeed.address);
+            // add rGld
+            await synter.addSynt(rGld.address, true);
+            // mint
+            await rUsd.mint(deployer.address, ETH.mul(2000)); // mint mock synt
+            await rUsd.approve(loan.address, ETH.mul(2000));
+            await rGld.mint(deployer.address, ETH.mul(40)); // mint mock synt
+            await loan.borrow(rGld.address, ETH.mul(10), ETH.mul(2000)); // x2 overcollateral
+            expect(await loan.totalShorts(rGld.address)).to.be.equal(ETH.mul(10));
+            expect(await loan.totalLongs(rGld.address)).to.be.equal(ETH.mul(40));
+        });
     });
 });
