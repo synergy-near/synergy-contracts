@@ -401,6 +401,9 @@ describe("Loan", function () {
             await rGld.mint(deployer.address, ETH.mul(40)); // mint mock synt
             await loan.borrow(rGld.address, ETH.mul(10), ETH.mul(2000)); // x2 overcollateral
             expect(await loan.totalShorts(rGld.address)).to.be.equal(ETH.mul(10));
+            expect(await loan.totalLongs(rGld.address)).to.be.equal(ETH.mul(50));
+            await synter.swapFrom(rGld.address, rUsd.address, ETH.mul(10));
+            expect(await loan.totalShorts(rGld.address)).to.be.equal(ETH.mul(10));
             expect(await loan.totalLongs(rGld.address)).to.be.equal(ETH.mul(40));
         });
     });

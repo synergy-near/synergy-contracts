@@ -337,7 +337,7 @@ contract Loan is Ownable {
      */
     function totalLongs(address _syntAddress) public view returns (uint256) {
         require(synter.syntInfo(_syntAddress).syntId != 0, "Synt doesn't exist");
-        return ISynt(_syntAddress).totalSupply() - synter.syntInfo(_syntAddress).totalShorts;
+        return ISynt(_syntAddress).totalSupply();
     }
 
     /**
