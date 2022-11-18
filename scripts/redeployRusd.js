@@ -63,8 +63,8 @@ async function main() {
     await loan.initialize(
         rUsd.address, // ISynt(_rUsd);
         config.SYNTER, // ISynter(_synter);
-        config.TREASURY, // ITreasury(_treasury);
-        config.ORACLE // IOracle(_oracle);
+        config.ORACLE, // IOracle(_oracle);
+        config.TREASURY // ITreasury(_treasury);
     );
 
     await oracle.initialize(

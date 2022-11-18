@@ -29,8 +29,8 @@ async function main() {
     await loan.initialize(
         config.RUSD, // ISynt(_rUsd);
         config.SYNTER, // ISynter(_synter);
-        config.TREASURY, // ITreasury(_treasury);
-        config.ORACLE // IOracle(_oracle);
+        config.ORACLE, // IOracle(_oracle);
+        config.TREASURY // ITreasury(_treasury);
     );
 
     await synter.initialize(
