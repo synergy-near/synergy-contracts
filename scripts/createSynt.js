@@ -57,11 +57,16 @@ async function addTruflationSynt(name, symbol, synter, oracle, feedAddress) {
 }
 
 async function main() {
-    Synter = await ethers.getContractFactory("Synter");
-    synter = await Synter.attach(config.SYNTER);
+    // Synter = await ethers.getContractFactory("Synter");
+    // synter = await Synter.attach(config.SYNTER);
 
-    Oracle = await ethers.getContractFactory("Oracle");
-    oracle = await Oracle.attach(config.ORACLE);
+    // Oracle = await ethers.getContractFactory("Oracle");
+    // oracle = await Oracle.attach(config.ORACLE);
+
+    const MockDataFeed = await ethers.getContractFactory("MockDataFeed");
+    dataFeed = await MockDataFeed.attach(config.RGAS_DATAFEED);
+    dataFeed.changePrice(ethers.utils.parseEther("12.8"));
+    console.log("Price set : %s", ethers.utils.parseEther("12.8"));
 
     // await addTruflationSynt("Housing Prices Index", "rHPI", synter, oracle, config.TRUFLATION);
     // await oracle.changeFeed(config.RGLD, config.DATAFEED_RGLD);

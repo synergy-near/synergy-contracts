@@ -7,7 +7,7 @@ async function main() {
     goldNft = await GoldNft.deploy(
         ethers.utils.parseEther("1").div(100) // 1% fee
     );
-
+    // goldNft = await GoldNft.attach(config.NFT);
     await goldNft.initialize(config.RGLD, config.TREASURY);
 
     await goldNft.setCardUri(0, "ipfs://QmcwJeiVieJFe5GCn1KwmxPYu2MEcH8RSZDGpHs4z4Ng2L/coin.json");
