@@ -122,16 +122,33 @@ async function deployMockDataFeed(assetName, assetPrice) {
 }
 
 async function main() {
-    treasury = await deployTreasury();
-    synter = await deploySynter(); // need init
-    rUsd = await deploySynt("Raw USD", "rUSD"); // need init
-    synergy = await deploySynergy(); // need init
-    oracle = await deployOracle(); // need init
-    loan = await deployLoan(); // need init
-    insurance = await deployInsurance(); // need init
-    raw = await deployRaw(); // need init
-
-    wEth = await deployMockWeth();
+    // treasury = await deployTreasury();
+    Treasury = await ethers.getContractFactory("Treasury");
+    treasury = await Treasury.attach("0xcB8ADE5a0122D2Ee4fD91b0d533d4d7c63044ce7");
+    // synter = await deploySynter(); // need init
+    Synter = await ethers.getContractFactory("Synter");
+    synter = await Synter.attach("0x771bc3da4AEfAd4D1DDE0D03A28e8043969E0569");
+    // rUsd = await deploySynt("Raw USD", "rUSD"); // need init
+    Rusd = await ethers.getContractFactory("Synt");
+    rUsd = await Rusd.attach("0xeb8514f2f953E7c266C4dc08477f28089c793dd1");
+    // synergy = await deploySynergy(); // need init
+    Synergy = await ethers.getContractFactory("Synergy");
+    synergy = Synergy.attach("0x3020F71F49bB99920368A3f068f437880391F094");
+    // oracle = await deployOracle(); // need init
+    Oracle = await ethers.getContractFactory("Oracle");
+    oracle = await Oracle.attach("0x033Fa01fE5E7D2FEcaa370F7d09FA730CA2E7a6B");
+    // loan = await deployLoan(); // need init
+    Loan = await ethers.getContractFactory("Loan");
+    loan = await Loan.attach("0x4d19BC4b07F97926544CEAC7CaAA6023F942A720");
+    // insurance = await deployInsurance(); // need init
+    Insurance = await ethers.getContractFactory("Insurance");
+    insurance = await Insurance.attach("0x1FA0c70dD4A072eF4F21dFbD98c708889eFF5f59");
+    //raw = await deployRaw(); // need init
+    Raw = await ethers.getContractFactory("Raw");
+    raw = await Raw.attach("0x18Cd2C6dD35EED4c06226618A2717F61A7FDAa0e");
+    //wEth = await deployMockWeth();
+    Weth = await ethers.getContractFactory("MockWeth");
+    wEth = Weth.attach("0xDA14187c837aB47f997a6DDceFc094A633439704");
 
     await synter.initialize(
         rUsd.address, // _rUsdAddress,
@@ -183,7 +200,8 @@ async function main() {
     await oracle.changeFeed(raw.address, dataFeed.address);
 
     // set datafeed for wETH
-    await oracle.changeFeed(wEth.address, "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e");
+    dataFeed = await deployMockDataFeed("WETH", ethers.utils.parseEther("1200"));
+    await oracle.changeFeed(wEth.address, dataFeed.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -192,14 +210,3 @@ main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
 });
-
-module.exports = {
-    deployTreasury,
-    deploySynter,
-    deploySynt,
-    deploySynergy,
-    deployOracle,
-    deployLoan,
-    deployInsurance,
-    deployRaw,
-};

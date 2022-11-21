@@ -8,7 +8,11 @@ async function main() {
         ethers.utils.parseEther("1").div(100) // 1% fee
     );
     // goldNft = await GoldNft.attach(config.NFT);
-    await goldNft.initialize(config.RGLD, config.TREASURY);
+    // await goldNft.initialize(config.RGLD, config.TREASURY);
+    await goldNft.initialize(
+        "0x976F6A26e5A05bf07296615F3520D9E71B254875",
+        "0xcB8ADE5a0122D2Ee4fD91b0d533d4d7c63044ce7"
+    );
 
     await goldNft.setCardUri(0, "ipfs://QmcwJeiVieJFe5GCn1KwmxPYu2MEcH8RSZDGpHs4z4Ng2L/coin.json");
     await goldNft.setCardUri(

@@ -12,10 +12,18 @@ module.exports = {
             url: process.env.GOERLI_URL,
             accounts: [process.env.PRIVATE_KEY],
         },
+        auroraTestnet: {
+            url: process.env.AURORA_URL,
+            accounts: [process.env.PRIVATE_KEY],
+            gasMultiplier: 1.2,
+        },
     },
     etherscan: {
         // Your API key for Etherscan
         // Obtain one at https://etherscan.io/
-        apiKey: process.env.ETHERSCAN_API_KEY,
+        apiKey: {
+            auroraTestnet: process.env.AURORASCAN_API_KEY,
+            goerli: process.env.ETHERSCAN_API_KEY,
+        },
     },
 };
